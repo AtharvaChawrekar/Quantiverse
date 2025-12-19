@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Check,
@@ -8,6 +7,7 @@ import {
   AlertCircle,
   Rows,
   ArrowLeft,
+  Award,
 } from "lucide-react";
 import {
   fetchSimulations,
@@ -16,15 +16,16 @@ import {
 import { UserAuth } from "../Auth/AuthContext";
 import { supabase } from "../utils/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import Certificate from "./Certificate";
 
-
-const TaskItem = ({ task, number, onClick, simulationId  }) => {
-
-    const navigate = useNavigate();
+const TaskItem = ({ task, number, onClick, simulationId }) => {
+  const navigate = useNavigate();
 
   const getConfirmationStatusColor = (status) => {
     switch (status) {
       case "confirmed":
+      case "accepted":
+      case "approved":
         return "bg-green-100 text-green-800";
       case "pending":
         return "bg-yellow-100 text-yellow-800";
@@ -32,6 +33,21 @@ const TaskItem = ({ task, number, onClick, simulationId  }) => {
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getConfirmationStatusText = (status) => {
+    switch (status) {
+      case "confirmed":
+      case "accepted":
+      case "approved":
+        return "approved";
+      case "pending":
+        return "pending";
+      case "rejected":
+        return "rejected";
+      default:
+        return status;
     }
   };
 
@@ -50,7 +66,7 @@ const TaskItem = ({ task, number, onClick, simulationId  }) => {
     }
   };
 
-    return (
+  return (
     <div
       className={`flex items-center justify-between py-4 px-4 transition-all duration-200 ${
         task.status !== "locked"
@@ -58,75 +74,74 @@ const TaskItem = ({ task, number, onClick, simulationId  }) => {
           : "opacity-60"
       }`}
     >
-        <div className="flex items-center gap-4">
-          {getStatusIcon()}
-          <div className="flex-1">
-            <div className="flex flex-col gap-1">
-              <p className="font-semibold text-gray-800">
-                Task {number}: {task.title}
-              </p>
+      <div className="flex items-center gap-4">
+        {getStatusIcon()}
+        <div className="flex-1">
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold text-gray-800">
+              Task {number}: {task.title}
+            </p>
 
-              <div className="flex gap-4 text-sm text-gray-600">
-                {task.status && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-500">Submission:</span>
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        task.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : task.status === "in_progress"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {task.status.replace("_", " ")}
-                    </span>
-                  </div>
-                )}
+            <div className="flex gap-4 text-sm text-gray-600">
+              {task.status && (
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-500">Submission:</span>
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${
+                      task.status === "completed"
+                        ? "bg-green-100 text-green-800"
+                        : task.status === "in_progress"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    {task.status.replace("_", " ")}
+                  </span>
+                </div>
+              )}
 
-                {task.confirmation_status && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-500">Confirmation:</span>
-                    <span
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${getConfirmationStatusColor(
-                        task.confirmation_status
-                      )}`}
-                    >
-                      {task.confirmation_status}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 mt-1 flex-wrap">
-              {task.updated_at && (
-                <p className="text-xs text-gray-400">
-                  Last updated: {new Date(task.updated_at).toLocaleDateString()}
-                </p>
+              {task.confirmation_status && (
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-gray-500">Confirmation:</span>
+                  <span
+                    className={`text-xs font-medium px-2 py-1 rounded-full ${getConfirmationStatusColor(
+                      task.confirmation_status
+                    )}`}
+                  >
+                    {getConfirmationStatusText(task.confirmation_status)}
+                  </span>
+                </div>
               )}
             </div>
           </div>
-        </div>
 
-        {(task.status === "in_progress" || task.confirmation_status === "rejected") && (
-          <div
-            className="flex items-center gap-2 text-blue-600 font-medium"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/internship/${simulationId}/task/${number}`);
-            }}
-          >
-            <span className="text-sm">
-              {task.confirmation_status === "rejected" ? "Redo" : "Continue"}
-            </span>
-            <ArrowRight className="w-4 h-4 animate-pulse" />
+          <div className="flex items-center gap-4 mt-1 flex-wrap">
+            {task.updated_at && (
+              <p className="text-xs text-gray-400">
+                Last updated: {new Date(task.updated_at).toLocaleDateString()}
+              </p>
+            )}
           </div>
-        )}
-
+        </div>
       </div>
-    );
 
+      {(task.status === "in_progress" ||
+        task.confirmation_status === "rejected") && (
+        <div
+          className="flex items-center gap-2 text-blue-600 font-medium"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/internship/${simulationId}/task/${number}`);
+          }}
+        >
+          <span className="text-sm">
+            {task.confirmation_status === "rejected" ? "Redo" : "Continue"}
+          </span>
+          <ArrowRight className="w-4 h-4 animate-pulse" />
+        </div>
+      )}
+    </div>
+  );
 };
 
 const ProgressPage = () => {
@@ -134,11 +149,49 @@ const ProgressPage = () => {
   const [openSimIds, setOpenSimIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-    const navigate = useNavigate();
-  
+  const [certificateData, setCertificateData] = useState(null);
+  const navigate = useNavigate();
 
   const { session } = UserAuth();
   const user = session?.user;
+
+  // Get user's first and last name from metadata
+  const getUserFullName = () => {
+    if (!user) return "";
+    const metadata = user.user_metadata || {};
+    const firstName = metadata.first_name || "";
+    const lastName = metadata.last_name || "";
+    if (firstName || lastName) {
+      return `${firstName} ${lastName}`.trim();
+    }
+    return metadata.display_name || user.email?.split("@")[0] || "User";
+  };
+
+  // Check if all tasks are completed AND approved
+  const isInternshipFullyApproved = (sim) => {
+    if (!sim.tasks || sim.tasks.length === 0) return false;
+    return sim.tasks.every(
+      (task) =>
+        task.status === "completed" &&
+        ["confirmed", "accepted", "approved"].includes(task.confirmation_status)
+    );
+  };
+
+  const handleViewCertificate = (sim) => {
+    const completionDate = sim.tasks.reduce((latest, task) => {
+      if (task.updated_at && new Date(task.updated_at) > new Date(latest)) {
+        return task.updated_at;
+      }
+      return latest;
+    }, sim.tasks[0]?.updated_at || new Date().toISOString());
+
+    setCertificateData({
+      userName: getUserFullName(),
+      internshipTitle: sim.title,
+      companyName: sim.company || "",
+      completionDate: completionDate,
+    });
+  };
 
   const toggleAccordion = (id) => {
     setOpenSimIds((prev) =>
@@ -150,7 +203,9 @@ const ProgressPage = () => {
     try {
       const { data: progressData, error } = await supabase
         .from("user_task_progress")
-        .select(`simulation_id, task_id, status, updated_at, confirmation_status`)
+        .select(
+          `simulation_id, task_id, status, updated_at, confirmation_status`
+        )
         .eq("user_id", userId);
 
       if (error) throw error;
@@ -355,12 +410,12 @@ const ProgressPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <button
-            onClick={() => navigate('/internship')}
-            className="inline-flex items-center text-blue-950 hover:text-blue-500 mb-8 transition-colors group text-lg"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            Back to simulations
-          </button>
+          onClick={() => navigate("/internship")}
+          className="inline-flex items-center text-blue-950 hover:text-blue-500 mb-8 transition-colors group text-lg"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+          Back to simulations
+        </button>
         <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
           Your Progress
         </h1>
@@ -399,9 +454,9 @@ const ProgressPage = () => {
 
                   {isOpen && (
                     <div className="px-6 pb-6">
-                      {sim.tasks.some((t) => t.confirmation_status === "pending")
-                     
-                  }
+                      {sim.tasks.some(
+                        (t) => t.confirmation_status === "pending"
+                      )}
                       <div className="border border-gray-200 rounded-xl divide-y">
                         {sim.tasks.map((task, index) => (
                           <TaskItem
@@ -409,9 +464,10 @@ const ProgressPage = () => {
                             task={task}
                             number={index + 1}
                             simulationId={sim.id}
-
                             onClick={() =>
-                              (window.location.href = `/internship/${sim.id}/task/${index + 1}`)
+                              (window.location.href = `/internship/${
+                                sim.id
+                              }/task/${index + 1}`)
                             }
                           />
                         ))}
@@ -420,14 +476,26 @@ const ProgressPage = () => {
                       <div className="flex gap-4 mt-6">
                         <button
                           onClick={() => handleNavigateToTask(sim)}
-                          className={`flex-1 py-3 rounded-lg font-semibold ${getButtonClasses(sim.status)}`}
+                          className={`flex-1 py-3 rounded-lg font-semibold ${getButtonClasses(
+                            sim.status
+                          )}`}
                         >
                           {getButtonText(sim.status)}
                         </button>
-                        {sim.status === "completed" && (
-                          <button className="px-6 py-3 border-2 border-green-500 text-green-600 font-bold rounded-lg hover:bg-green-50">
+                        {isInternshipFullyApproved(sim) && (
+                          <button 
+                            onClick={() => handleViewCertificate(sim)}
+                            className="flex items-center gap-2 px-6 py-3 border-2 border-green-500 text-green-600 font-bold rounded-lg hover:bg-green-50 transition-colors"
+                          >
+                            <Award className="w-5 h-5" />
                             View Certificate
                           </button>
+                        )}
+                        {sim.status === "completed" && !isInternshipFullyApproved(sim) && (
+                          <div className="flex items-center gap-2 px-6 py-3 bg-yellow-50 text-yellow-700 rounded-lg border border-yellow-200">
+                            <AlertCircle className="w-5 h-5" />
+                            <span className="text-sm font-medium">Awaiting approval for certificate</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -438,6 +506,18 @@ const ProgressPage = () => {
           </div>
         )}
       </div>
+
+      {/* Certificate Modal */}
+      {certificateData && (
+        <Certificate
+          isOpen={!!certificateData}
+          onClose={() => setCertificateData(null)}
+          userName={certificateData.userName}
+          internshipTitle={certificateData.internshipTitle}
+          companyName={certificateData.companyName}
+          completionDate={certificateData.completionDate}
+        />
+      )}
     </div>
   );
 };
