@@ -18,7 +18,7 @@ import { supabase } from "../utils/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import Certificate from "./Certificate";
 
-const TaskItem = ({ task, number, onClick, simulationId }) => {
+const TaskItem = ({ task, number, onClick, simulationId, onPreviewClick }) => {
   const navigate = useNavigate();
 
   const getConfirmationStatusColor = (status) => {
@@ -125,21 +125,25 @@ const TaskItem = ({ task, number, onClick, simulationId }) => {
         </div>
       </div>
 
-      {(task.status === "in_progress" ||
-        task.confirmation_status === "rejected") && (
-        <div
-          className="flex items-center gap-2 text-blue-600 font-medium"
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/internship/${simulationId}/task/${number}`);
-          }}
-        >
-          <span className="text-sm">
-            {task.confirmation_status === "rejected" ? "Redo" : "Continue"}
-          </span>
-          <ArrowRight className="w-4 h-4 animate-pulse" />
-        </div>
-      )}
+      {/* Action Buttons */}
+      <div className="flex items-center gap-3">
+        {/* Continue/Redo Button */}
+        {(task.status === "in_progress" ||
+          task.confirmation_status === "rejected") && (
+          <div
+            className="flex items-center gap-2 text-blue-600 font-medium cursor-pointer hover:text-blue-800 transition"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/internship/${simulationId}/task/${number}`);
+            }}
+          >
+            <span className="text-sm">
+              {task.confirmation_status === "rejected" ? "Redo" : "Continue"}
+            </span>
+            <ArrowRight className="w-4 h-4 animate-pulse" />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -204,7 +208,7 @@ const ProgressPage = () => {
       const { data: progressData, error } = await supabase
         .from("user_task_progress")
         .select(
-          `simulation_id, task_id, status, updated_at, confirmation_status`
+          `simulation_id, task_id, status, updated_at, confirmation_status, uploaded_work_url, comment`
         )
         .eq("user_id", userId);
 
@@ -518,6 +522,7 @@ const ProgressPage = () => {
           completionDate={certificateData.completionDate}
         />
       )}
+
     </div>
   );
 };

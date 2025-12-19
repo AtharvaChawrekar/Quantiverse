@@ -17,10 +17,12 @@ import {
   FileText,
   Clock,
   ArrowLeft,
+  Eye,
 } from "lucide-react";
 import { useUser } from "@supabase/auth-helpers-react";
 import { supabase } from "../utils/supabaseClient";
 import WorkUpload from "./WorkUpload";
+import SubmissionPreviewModal from "./SubmissionPreviewModal";
 
 const TaskStepper = ({ tasks, currentTaskIndex, simulationId, simulation }) => {
   const navigate = useNavigate();
@@ -191,6 +193,7 @@ const SimulationTaskPage = () => {
   const [error, setError] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [enrollmentChecked, setEnrollmentChecked] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -678,6 +681,36 @@ const SimulationTaskPage = () => {
           currentUser={currentUser}
         />
 
+        {/* View Previous Submission */}
+        {currentTask.status === "completed" && currentTask.uploaded_work_url && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-blue-900 flex items-center gap-2 mb-2">
+                  <FileText className="w-5 h-5" />
+                  Your Submission
+                </h3>
+                <p className="text-sm text-blue-700">
+                  View and reupload your submitted work
+                </p>
+                {currentTask.confirmation_status === "rejected" && (
+                  <p className="text-sm text-red-600 font-medium mt-2">
+                    ⚠️ This submission was rejected. Please review feedback and reupload.
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setIsPreviewModalOpen(true)}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                title="View and reupload your submission"
+              >
+                <Eye className="w-5 h-5" />
+                <span>Preview & Reupload</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Navigation buttons */}
         <div className="pt-4 flex gap-3">
           {currentTask.status === "completed" ? (
@@ -702,6 +735,23 @@ const SimulationTaskPage = () => {
             )
           )}
         </div>
+
+        {/* Submission Preview Modal */}
+        {isPreviewModalOpen && (
+          <SubmissionPreviewModal
+            task={{
+              ...currentTask,
+              user_id: currentUser?.id,
+            }}
+            isOpen={isPreviewModalOpen}
+            onClose={() => setIsPreviewModalOpen(false)}
+            onReuploadSuccess={() => {
+              setIsPreviewModalOpen(false);
+              // Reload page to refresh submission data
+              window.location.reload();
+            }}
+          />
+        )}
       </main>
     </div>
   );
