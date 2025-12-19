@@ -21,6 +21,7 @@ function numberToWords(n) {
 function AddInternship() {
 
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
   const [simulation, setSimulation] = useState({
     title: '',
     description: '',
@@ -122,7 +123,14 @@ function AddInternship() {
     const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!isFormValid()) return;
+  // Prevent duplicate submissions
+  if (isSubmitting) return;
+  setIsSubmitting(true);
+
+  if (!isFormValid()) {
+    setIsSubmitting(false);
+    return;
+  }
 
   try {
     const cleanedSimulation = {
@@ -232,12 +240,15 @@ function AddInternship() {
       materialFile: null,
       material_url: '',
     }]);
-      setFileResetKey(Date.now()); 
+      setFileResetKey(Date.now());
+      setIsSubmitting(false);
+      navigate('/edit-internship');
 
 
   } catch (error) {
     console.error('❌ Unexpected error:', error);
     alert('❌ An unexpected error occurred.');
+    setIsSubmitting(false);
   }
 };
 const [fileResetKey, setFileResetKey] = useState(Date.now());
@@ -597,9 +608,10 @@ const [fileResetKey, setFileResetKey] = useState(Date.now());
   <div className="text-center">
     <button
       type="submit"
-      className="button button-l !bg-green-500"
+      disabled={isSubmitting}
+      className={`button button-l !bg-green-500 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
-      Submit Simulation
+      {isSubmitting ? 'Submitting...' : 'Submit Simulation'}
     </button>
   </div>
 </form>

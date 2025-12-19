@@ -194,6 +194,10 @@ const SimulationDetail = () => {
   const currentTask = tasks.find((task) => task.id === selectedTask);
 
   const handleStartProgram = () => {
+    if (!isEnrolled) {
+      alert('Please enroll in this program first before starting.');
+      return;
+    }
     setIsLoading(true);
     setTimeout(() => {
       navigate(`/internship/${id}/task/${nextTaskNumber}`);
@@ -305,7 +309,8 @@ const SimulationDetail = () => {
                 <button
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-md shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleStartProgram}
-                  disabled={isLoading}
+                  disabled={isLoading || !isEnrolled}
+                  title={!isEnrolled ? "Please enroll first to start the program" : ""}
                 >
                   {getButtonText()}
                 </button>

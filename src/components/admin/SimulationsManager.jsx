@@ -114,10 +114,10 @@ function SimulationsManager() {
     navigate("/edit-internship");
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (simulation) => {
     if (
       !window.confirm(
-        "Are you sure you want to delete this simulation? This action cannot be undone."
+        `Are you sure you want to delete the simulation "${simulation.title}"? This action cannot be undone.`
       )
     ) {
       return;
@@ -128,7 +128,7 @@ function SimulationsManager() {
       const { error: tasksError } = await supabase
         .from("tasks")
         .delete()
-        .eq("simulation_id", selectedSimulation.id);
+        .eq("simulation_id", simulation.id);
 
       if (tasksError) {
         console.error("Error deleting tasks:", tasksError);
@@ -139,12 +139,17 @@ function SimulationsManager() {
       const { error: simError } = await supabase
         .from("simulations")
         .delete()
-        .eq("id", selectedSimulation.id);
+        .eq("id", simulation.id);
 
       if (simError) throw simError;
 
       alert("Simulation deleted successfully!");
-      navigate("/edit-internship");
+      // If on grid, just refresh list
+      if (!selectedSimulation || selectedSimulation.id !== simulation.id) {
+        fetchSimulations();
+      } else {
+        navigate("/edit-internship");
+      }
     } catch (err) {
       console.error("Error deleting simulation:", err);
       alert(`Failed to delete simulation: ${err.message}`);
@@ -412,7 +417,7 @@ function SimulationsManager() {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            alert("Delete functionality coming soon");
+                            handleDelete(simulation);
                           }}
                           className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 font-medium transition-colors"
                         >

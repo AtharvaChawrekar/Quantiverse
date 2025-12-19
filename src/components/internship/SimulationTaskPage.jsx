@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   fetchSimulations,
   fetchTasksForSimulation,
@@ -188,6 +189,8 @@ const SimulationTaskPage = () => {
   const [isCompleting, setIsCompleting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollmentChecked, setEnrollmentChecked] = useState(false);
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -215,6 +218,46 @@ const SimulationTaskPage = () => {
 
     getCurrentUser();
   }, [hookUser]);
+
+  // Check enrollment status before allowing access to tasks
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (!userLoaded || !currentUser || !id) {
+        setEnrollmentChecked(true);
+        return;
+      }
+
+      try {
+        const response = await axios.get('http://127.0.0.1:5000/enrollment-status', {
+          params: {
+            user_id: currentUser.id,
+            internship_id: id
+          }
+        });
+
+        if (response.data && response.data.is_enrolled) {
+          setIsEnrolled(true);
+          setEnrollmentChecked(true);
+        } else {
+          setError('You must enroll in this program before accessing tasks.');
+          setIsEnrolled(false);
+          setEnrollmentChecked(true);
+          // Redirect to simulation detail page
+          setTimeout(() => {
+            navigate(`/simulation/${id}`, { replace: true });
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('Error checking enrollment:', err);
+        // Allow access anyway - don't block users if backend is down
+        // but log the error for debugging
+        setIsEnrolled(true);
+        setEnrollmentChecked(true);
+      }
+    };
+
+    checkEnrollment();
+  }, [userLoaded, currentUser, id, navigate]);
 
   const loadTasksWithProgress = useCallback(
     async (simulationId) => {
@@ -447,12 +490,30 @@ const SimulationTaskPage = () => {
     );
   }
 
-  if (loading) {
+  // Check if enrollment is being verified
+  if (!enrollmentChecked || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-500">Loading simulation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not enrolled, show error message
+  if (!isEnrolled) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Access Denied
+          </h2>
+          <p className="text-gray-600 mb-6">
+            You must enroll in this program before accessing the tasks. Redirecting...
+          </p>
         </div>
       </div>
     );
