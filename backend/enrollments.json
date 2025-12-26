@@ -78,5 +78,21 @@
     "internship_id": "40f7dabf-9a18-44aa-a4b1-94e15d964536",
     "internship_name": "E-Commerce Platform Development",
     "enrolled_at": "2025-12-22T11:45:13.830778"
+  },
+  {
+    "user_id": "d4f54d49-7ba2-4aa1-8dbf-4eada49c146a",
+    "user_name": "atharva",
+    "user_email": "chawrekaratharva@gmail.com",
+    "internship_id": "02150bd1-2d0b-4036-ac33-a22c22675850",
+    "internship_name": "Backend",
+    "enrolled_at": "2025-12-22T13:56:31.880414"
+  },
+  {
+    "user_id": "d4f54d49-7ba2-4aa1-8dbf-4eada49c146a",
+    "user_name": "atharva",
+    "user_email": "chawrekaratharva@gmail.com",
+    "internship_id": "6505b2bd-7ce2-428b-bb09-8a33d71a6b98",
+    "internship_name": "Hellow",
+    "enrolled_at": "2025-12-27T00:29:59.320277"
   }
 ]

@@ -3,6 +3,21 @@ import { supabase } from './supabaseClient';
 
 // Fetch all simulations
 export async function fetchSimulations() {
+  try {
+    // Try backend endpoint first (has fallback to JSON)
+    const response = await fetch('http://localhost:5000/admin/internships');
+    if (response.ok) {
+      const result = await response.json();
+      if (result.data) {
+        console.log('Fetched simulations from backend');
+        return result.data;
+      }
+    }
+  } catch (err) {
+    console.warn('Backend fetch failed, trying Supabase...', err.message);
+  }
+  
+  // Fallback to direct Supabase
   const { data, error } = await supabase
     .from('simulations')
     .select('*')

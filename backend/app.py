@@ -8,6 +8,8 @@ from match_gemini import match_skills
 from werkzeug.utils import secure_filename 
 import secrets
 from flask_cors import CORS
+from supabase import create_client
+from internship_api import internship_bp
 # Lazy import utils only when needed to avoid heavy dependencies on startup
 # from utils import generate_latex, compile_latex_to_pdf
 import io
@@ -26,9 +28,42 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax'     # Avoid CSRF in most common cases
 )
 
-# CORS(app, supports_credentials=True, origins="*")
-# CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+# CORS Configuration
+CORS(app, 
+     resources={r"/*": {
+         "origins": ["http://localhost:5173"],
+         "methods": ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+         "allow_headers": ["Content-Type", "Authorization"],
+         "supports_credentials": True
+     }})
+
+# Supabase Configuration
+SUPABASE_URL = "https://eplfwexdnkcwqdcqbgqq.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable__AMLXquwD7RHIyMWxrwBJw_MDGcJUA9"
+SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwbGZ3ZXhkbmtjd3FkY3FiZ3FxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTU3NDAyNSwiZXhwIjoyMDgxMTUwMDI1fQ.H_Xnst0j6BQ22JcC1HQvDB6FyrMmV5GpHERyWcNYLAA"
+
+try:
+    # Create two clients:
+    # 1. Anon client for reads (respects RLS)
+    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    
+    # 2. Service role client for writes (bypasses RLS)
+    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+    
+    print("✓ Supabase clients created successfully")
+except Exception as e:
+    print(f"⚠️  Supabase connection error: {str(e)}")
+    supabase = None
+    supabase_admin = None
+
+# Store both in app config for access in blueprints
+app.config['supabase'] = supabase
+app.config['supabase_admin'] = supabase_admin
+
+# Register Blueprints
+app.register_blueprint(internship_bp)
+
+
 
 
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -202,6 +237,12 @@ def check_enrollment_status():
         return jsonify({'error': str(e)}), 500
 
 
+# ===== INTERNSHIP ROUTES HANDLED BY internship_bp blueprint (see internship_api.py) =====
+# The blueprint handles:
+# - POST /admin/internships - Create new simulation
+# - PUT /admin/internships/<id> - Update simulation
+
+
 @app.route('/admin/internships/<internship_id>/candidates', methods=['GET'])
 def get_internship_candidates(internship_id):
     """Get all candidates enrolled in a specific internship"""
@@ -233,6 +274,31 @@ def get_internship_candidates(internship_id):
     except Exception as e:
         print(f"[ERROR] Failed to fetch candidates: {str(e)}")
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Check backend health and Supabase connection"""
+    try:
+        is_supabase_ok = False
+        if supabase:
+            try:
+                # Try a simple health check
+                supabase.table('simulations').select('*').limit(1).execute()
+                is_supabase_ok = True
+            except Exception as db_err:
+                print(f"Supabase health check failed: {str(db_err)}")
+        
+        return jsonify({
+            'status': 'ok',
+            'supabase_connected': is_supabase_ok,
+            'message': 'Backend is running'
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 
 @app.route('/')

@@ -245,9 +245,7 @@ const SimulationDetail = () => {
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 {simulation.title}
               </h1>
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed max-w-3xl">
-                {simulation.description}
-              </p>
+              <div className="text-xl text-blue-100 mb-8 leading-relaxed max-w-3xl [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-blue-100 [&_strong]:text-blue-50 [&_em]:text-blue-100" dangerouslySetInnerHTML={{ __html: simulation.description }} />
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
@@ -369,9 +367,7 @@ const SimulationDetail = () => {
                 Why Complete This Job Simulation
               </h2>
               <div className="rounded-lg border bg-white text-gray-900 shadow-sm p-8">
-                <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                  {simulation.overview}
-                </p>
+                <div className="text-lg text-gray-700 leading-relaxed mb-6 [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: simulation.overview }} />
                 <div className="flex flex-wrap gap-3 mb-6">
                   {simulation.features?.split(",").map((feature, index) => (
                     <div
@@ -451,9 +447,7 @@ const SimulationDetail = () => {
                       {currentTask.difficulty}
                     </div>
                   </div>
-                  <p className="text-gray-700 leading-relaxed text-lg mb-6">
-                    {currentTask.description}
-                  </p>
+                  <div className="text-gray-700 leading-relaxed text-lg mb-6 [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: currentTask.description }} />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* What you'll learn */}

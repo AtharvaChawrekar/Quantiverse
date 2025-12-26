@@ -2,6 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { supabase } from "../utils/supabaseClient";
+import { Editor } from "@tinymce/tinymce-react";
+
+// TinyMCE imports for self-hosted GPL mode
+import 'tinymce/tinymce';
+import 'tinymce/icons/default';
+import 'tinymce/themes/silver';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/table';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/content/default/content.min.css';
 
 function numberToWords(n) {
   const words = [
@@ -451,9 +463,7 @@ function SimulationsManager() {
                         </div>
                       </div>
 
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {simulation.description || simulation.overview}
-                      </p>
+                      <div className="text-gray-600 text-sm mb-4 line-clamp-2 [&_ul]:list-disc [&_ul]:ml-4 [&_ol]:list-decimal [&_ol]:ml-4 [&_li]:text-gray-600 [&_strong]:text-gray-800" dangerouslySetInnerHTML={{ __html: simulation.description || simulation.overview }} />
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-4">
@@ -651,17 +661,33 @@ function SimulationsManager() {
                   📝 Description
                 </h2>
                 {isEditing ? (
-                  <textarea
+                  <Editor
                     value={formState.description || ""}
-                    onChange={(e) =>
-                      handleInputChange("description", e.target.value)
+                    onEditorChange={(content) =>
+                      handleInputChange("description", content)
                     }
-                    className="w-full border border-gray-300 rounded-lg p-3 min-h-[100px]"
+                    init={{
+                      license_key: 'gpl',
+                      base_url: '/tinymce',
+                      height: 250,
+                      menubar: false,
+                      plugins: 'lists link code table',
+                      toolbar: 'undo redo | bold italic underline | bullist numlist | link | code | table',
+                      forced_root_block: 'p',
+                      invalid_elements: 'script,style,iframe,object,embed',
+                      content_style: `
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+                        ul { list-style-type: disc; margin: 0.5em 0; padding-left: 2em; }
+                        ol { list-style-type: decimal; margin: 0.5em 0; padding-left: 2em; }
+                        li { margin: 0.25em 0; }
+                        strong { font-weight: bold; }
+                        em { font-style: italic; }
+                        u { text-decoration: underline; }
+                      `,
+                    }}
                   />
                 ) : (
-                  <p className="text-gray-700 leading-relaxed">
-                    {selectedSimulation.description}
-                  </p>
+                  <div className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: selectedSimulation.description }} />
                 )}
               </div>
 
@@ -671,17 +697,33 @@ function SimulationsManager() {
                   🔍 Overview
                 </h2>
                 {isEditing ? (
-                  <textarea
+                  <Editor
                     value={formState.overview || ""}
-                    onChange={(e) =>
-                      handleInputChange("overview", e.target.value)
+                    onEditorChange={(content) =>
+                      handleInputChange("overview", content)
                     }
-                    className="w-full border border-gray-300 rounded-lg p-3 min-h-[100px]"
+                    init={{
+                      license_key: 'gpl',
+                      base_url: '/tinymce',
+                      height: 250,
+                      menubar: false,
+                      plugins: 'lists link code table',
+                      toolbar: 'undo redo | bold italic underline | bullist numlist | link | code | table',
+                      forced_root_block: 'p',
+                      invalid_elements: 'script,style,iframe,object,embed',
+                      content_style: `
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+                        ul { list-style-type: disc; margin: 0.5em 0; padding-left: 2em; }
+                        ol { list-style-type: decimal; margin: 0.5em 0; padding-left: 2em; }
+                        li { margin: 0.25em 0; }
+                        strong { font-weight: bold; }
+                        em { font-style: italic; }
+                        u { text-decoration: underline; }
+                      `,
+                    }}
                   />
                 ) : (
-                  <p className="text-gray-700 leading-relaxed">
-                    {selectedSimulation.overview}
-                  </p>
+                  <div className="text-gray-700 leading-relaxed [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:text-gray-700 [&_strong]:text-gray-900 [&_em]:text-gray-700" dangerouslySetInnerHTML={{ __html: selectedSimulation.overview }} />
                 )}
               </div>
 
