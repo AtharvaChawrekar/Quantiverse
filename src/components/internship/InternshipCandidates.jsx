@@ -14,10 +14,17 @@ const InternshipCandidates = () => {
 
   useEffect(() => {
     fetchCandidates();
+    
+    // Set up auto-refresh interval to poll for progress updates
+    const refreshInterval = setInterval(() => {
+      fetchCandidates();
+    }, 3000); // Refresh every 3 seconds
+
+    // Clean up interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, [internshipId]);
 
   const fetchCandidates = async () => {
-    setLoading(true);
     setError(null);
     
     try {
@@ -101,21 +108,26 @@ const InternshipCandidates = () => {
         )}
 
         {/* Candidates Table */}
+        
         {!error && candidates.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Enrolled Date & Time
-                  </th>
-                </tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Student Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Enrolled Date & Time
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Progress
+                </th>
+              </tr>
+
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {candidates.map((candidate, index) => (
@@ -144,6 +156,20 @@ const InternshipCandidates = () => {
                         {formatDate(candidate.enrolled_at)}
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="w-40">
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
+                        <div
+                          className="bg-green-500 h-2 rounded-full transition-all"
+                          style={{ width: `${candidate.progress || 0}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {candidate.completed_tasks || 0}/{candidate.total_tasks || 0}
+                        {" "}({candidate.progress || 0}%)
+                      </div>
+                    </div>
+                  </td>
                   </tr>
                 ))}
               </tbody>

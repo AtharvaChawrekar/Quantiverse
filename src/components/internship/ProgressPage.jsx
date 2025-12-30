@@ -323,6 +323,92 @@ const ProgressPage = () => {
     loadSimulationsWithProgress();
   }, [user]);
 
+  // Polling for real-time progress updates
+  useEffect(() => {
+    if (!user) return;
+
+    const pollInterval = setInterval(() => {
+      const loadSimulationsWithProgress = async () => {
+        try {
+          const simData = await fetchSimulations();
+          const allUserProgress = await getUserTaskProgress(user.id);
+
+          const userSimulationIds = [
+            ...new Set(allUserProgress.map((p) => p.simulation_id)),
+          ];
+
+          const userSimulations = simData.filter((sim) =>
+            userSimulationIds.includes(sim.id)
+          );
+
+          const simulationsWithProgress = await Promise.all(
+            userSimulations.map(async (sim) => {
+              const allTasks = await fetchTasksForSimulation(sim.id);
+              const simProgressData = allUserProgress.filter(
+                (p) => p.simulation_id === sim.id
+              );
+
+              const userTasks = allTasks.filter((task) =>
+                simProgressData.some((p) => p.task_id === task.id)
+              );
+
+              const tasksWithProgress = mergeTasksWithProgress(
+                userTasks,
+                simProgressData,
+                sim.id
+              );
+
+              const completedTasks = tasksWithProgress.filter(
+                (t) => t.status === "completed"
+              ).length;
+              const inProgressTasks = tasksWithProgress.filter(
+                (t) => t.status === "in_progress"
+              ).length;
+              const totalTasks = tasksWithProgress.length;
+              const progress = totalTasks
+                ? Math.round((completedTasks / totalTasks) * 100)
+                : 0;
+
+              let status = "not_started";
+              if (completedTasks === totalTasks && totalTasks > 0) {
+                status = "completed";
+              } else if (completedTasks > 0 || inProgressTasks > 0) {
+                status = "in_progress";
+              }
+
+              return {
+                ...sim,
+                tasks: tasksWithProgress,
+                completedTasks,
+                totalTasks,
+                progress,
+                status,
+              };
+            })
+          );
+
+          const sortedSimulations = simulationsWithProgress.sort((a, b) => {
+            const statusOrder = {
+              in_progress: 0,
+              completed: 1,
+              not_started: 2,
+              error: 3,
+            };
+            return statusOrder[a.status] - statusOrder[b.status];
+          });
+
+          setSimulations(sortedSimulations);
+        } catch (error) {
+          console.error("Error updating progress:", error);
+        }
+      };
+
+      loadSimulationsWithProgress();
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [user]);
+
   const handleNavigateToTask = (sim) => {
     const inProgressTask = sim.tasks.find((t) => t.status === "in_progress");
     const firstIncompleteTask = sim.tasks.find((t) => t.status !== "completed");
@@ -444,13 +530,37 @@ const ProgressPage = () => {
                 <div key={sim.id} className="bg-white rounded-2xl shadow-lg">
                   <button
                     onClick={() => toggleAccordion(sim.id)}
-                    className="w-full text-left px-6 py-4 flex items-center justify-between"
+                    className="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                   >
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-lg font-bold py-2">{sim.title}</h3>
+                      <div className="mt-3 flex items-center gap-4">
+                        <div className="flex-1 max-w-xs">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-semibold text-gray-700">
+                              {sim.completedTasks}/{sim.totalTasks} completed
+                            </span>
+                            <span className="text-sm font-bold text-blue-600">
+                              {sim.progress}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className={`h-2.5 rounded-full transition-all duration-300 ${
+                                sim.progress === 100
+                                  ? "bg-green-500"
+                                  : sim.progress >= 50
+                                  ? "bg-blue-500"
+                                  : "bg-amber-500"
+                              }`}
+                              style={{ width: `${sim.progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                     <ChevronDown
-                      className={`w-5 h-5 transition-transform ${
+                      className={`w-5 h-5 transition-transform ml-4 flex-shrink-0 ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     />

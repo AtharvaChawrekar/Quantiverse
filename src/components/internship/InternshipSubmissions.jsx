@@ -115,6 +115,16 @@ const InternshipSubmissions = () => {
     });
   };
 
+  const markTaskComplete = async (taskId) => {
+  await axios.patch(
+    `http://127.0.0.1:5000/enrollments/${internshipId}/${userId}/tasks/${taskId}`
+  );
+
+  // refetch candidates or tasks
+  fetchCandidates(); // or fetchTasks()
+};
+
+
   const getStatusBadge = (confirmationStatus) => {
     switch (confirmationStatus) {
       case "confirmed":
@@ -439,6 +449,7 @@ const InternshipSubmissions = () => {
       </div>
     </div>
   );
+  
 };
 
 export default InternshipSubmissions;
