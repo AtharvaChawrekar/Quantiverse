@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { supabase } from "../utils/supabaseClient";
 import { Editor } from "@tinymce/tinymce-react";
+import CategoryAutocomplete from "../CategoryAutocomplete";
 
 // TinyMCE imports for self-hosted GPL mode
 import 'tinymce/tinymce';
@@ -592,8 +593,8 @@ function SimulationsManager() {
 
                   <div className="flex flex-wrap gap-3 mb-4">
                     {isEditing ? (
-                      <input
-                        type="text"
+                      <CategoryAutocomplete
+                        name="category"
                         value={formState.category || ""}
                         onChange={(e) =>
                           handleInputChange("category", e.target.value)
@@ -671,10 +672,41 @@ function SimulationsManager() {
                       base_url: '/tinymce',
                       height: 250,
                       menubar: false,
-                      plugins: 'lists link code table',
-                      toolbar: 'undo redo | bold italic underline | bullist numlist | link | code | table',
+                      plugins: 'lists link table',
+                      toolbar: 'undo redo | bold italic underline | bullist numlist | link | table',
                       forced_root_block: 'p',
-                      invalid_elements: 'script,style,iframe,object,embed',
+                      invalid_elements: 'script,style,iframe,object,embed,form,input,button',
+                      invalid_styles: 'position,top,left,right,bottom',
+                      allow_script_urls: false,
+                      convert_urls: false,
+                      paste_as_text: false,
+                      paste_block_drop: false,
+                      paste_data_images: false,
+                      paste_preprocess: function(plugin, args) {
+                        args.content = args.content
+                          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                          .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+                          .replace(/javascript:/gi, '')
+                          .replace(/data:/gi, '');
+                      },
+                      link_assume_external_targets: true,
+                      link_target_list: [
+                        {title: 'None', value: ''},
+                        {title: 'New window', value: '_blank'}
+                      ],
+                      urlconverter_callback: function(url, node, on_save, name) {
+                        if (url.startsWith('javascript:') || url.startsWith('data:') || url.startsWith('vbscript:')) {
+                          return '';
+                        }
+                        return url;
+                      },
+                      setup: function(editor) {
+                        editor.on('BeforeSetContent', function(e) {
+                          e.content = e.content
+                            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                            .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+                        });
+                      },
                       content_style: `
                         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
                         ul { list-style-type: disc; margin: 0.5em 0; padding-left: 2em; }
@@ -707,10 +739,41 @@ function SimulationsManager() {
                       base_url: '/tinymce',
                       height: 250,
                       menubar: false,
-                      plugins: 'lists link code table',
-                      toolbar: 'undo redo | bold italic underline | bullist numlist | link | code | table',
+                      plugins: 'lists link table',
+                      toolbar: 'undo redo | bold italic underline | bullist numlist | link | table',
                       forced_root_block: 'p',
-                      invalid_elements: 'script,style,iframe,object,embed',
+                      invalid_elements: 'script,style,iframe,object,embed,form,input,button',
+                      invalid_styles: 'position,top,left,right,bottom',
+                      allow_script_urls: false,
+                      convert_urls: false,
+                      paste_as_text: false,
+                      paste_block_drop: false,
+                      paste_data_images: false,
+                      paste_preprocess: function(plugin, args) {
+                        args.content = args.content
+                          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                          .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+                          .replace(/javascript:/gi, '')
+                          .replace(/data:/gi, '');
+                      },
+                      link_assume_external_targets: true,
+                      link_target_list: [
+                        {title: 'None', value: ''},
+                        {title: 'New window', value: '_blank'}
+                      ],
+                      urlconverter_callback: function(url, node, on_save, name) {
+                        if (url.startsWith('javascript:') || url.startsWith('data:') || url.startsWith('vbscript:')) {
+                          return '';
+                        }
+                        return url;
+                      },
+                      setup: function(editor) {
+                        editor.on('BeforeSetContent', function(e) {
+                          e.content = e.content
+                            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+                            .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+                        });
+                      },
                       content_style: `
                         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
                         ul { list-style-type: disc; margin: 0.5em 0; padding-left: 2em; }
