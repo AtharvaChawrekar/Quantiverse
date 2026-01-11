@@ -18,17 +18,17 @@ body {
 }
 
 /* ============================================
-   THEME VARIABLES - Modern Professional Color Scheme
-   Primary: Deep Blue (#2563eb)
-   Secondary: Emerald (#10b981)
-   Accent: Violet (#8b5cf6)
+   THEME VARIABLES - Dark Slate with Emerald
+   Primary: Emerald (#10b981)
+   Secondary: Dark Slate (#1e293b)
+   Accent: Teal (#14b8a6)
    ============================================ */
 @theme {
   /* Primary Colors */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #dbeafe;
-  --color-primary-dark: #1e40af;
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-primary-light: #d1fae5;
+  --color-primary-dark: #047857;
   
   /* Secondary Colors */
   --color-secondary: #10b981;
@@ -88,18 +88,18 @@ body {
    ============================================ */
 
 .bg-radial-blue {
-  background: linear-gradient(135deg, #f8fafc 0%, #dbeafe 50%, #f8fafc 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #d1fae5 50%, #f8fafc 100%);
 }
 
 .bg-gradient-subtle {
-  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #e0f2fe 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #ecfdf5 50%, #d1fae5 100%);
 }
 
 .bg-mesh {
   background-color: #f8fafc;
   background-image: 
-    radial-gradient(at 40% 20%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.06) 0px, transparent 50%);
+    radial-gradient(at 40% 20%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, rgba(20, 184, 166, 0.06) 0px, transparent 50%);
 }
 
 /* ============================================
@@ -128,8 +128,8 @@ body {
 }
 
 .card-interactive:hover {
-  border-color: #2563eb;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  border-color: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
 
 /* ============================================
@@ -196,6 +196,7 @@ body {
 .form-input,
 .input-style {
   width: 100%;
+  margin-bottom: 1rem;
   padding: 0.625rem 0.875rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
@@ -208,8 +209,8 @@ body {
 .form-input:focus,
 .input-style:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .form-input::placeholder,
@@ -272,7 +273,7 @@ body {
   border-radius: 9999px;
 }
 
-.badge-primary { background-color: #dbeafe; color: #1e40af; }
+.badge-primary { background-color: #d1fae5; color: #047857; }
 .badge-success { background-color: #d1fae5; color: #065f46; }
 .badge-warning { background-color: #fef3c7; color: #92400e; }
 .badge-danger { background-color: #fee2e2; color: #b91c1c; }

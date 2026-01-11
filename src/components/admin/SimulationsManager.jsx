@@ -360,7 +360,7 @@ function SimulationsManager() {
               </div>
               <button
                 onClick={() => navigate("/add-internship")}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition flex items-center gap-2"
               >
                 <span>➕</span>
                 Create New Simulation
@@ -379,7 +379,7 @@ function SimulationsManager() {
                 </p>
                 <button
                   onClick={() => navigate("/add-internship")}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+                  className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition"
                 >
                   Create Simulation
                 </button>
@@ -400,7 +400,7 @@ function SimulationsManager() {
                             e.stopPropagation();
                             handleSimulationClick(simulation.id);
                           }}
-                          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                          className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 font-medium transition-colors"
                         >
                           ✏️ Edit Internship
                         </button>
@@ -422,7 +422,7 @@ function SimulationsManager() {
                               `/admin/internship/${simulation.id}/submissions`
                             );
                           }}
-                          className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 font-medium transition-colors"
+                          className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700 font-medium transition-colors"
                         >
                           📄 View Submissions
                         </button>
@@ -473,7 +473,7 @@ function SimulationsManager() {
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-4">
                         {simulation.category && (
-                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                          <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full">
                             {simulation.category}
                           </span>
                         )}
@@ -529,7 +529,7 @@ function SimulationsManager() {
                   {!isEditing ? (
                     <button
                       onClick={handleEditClick}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
                       disabled={loading}
                     >
                       ✏️ Edit
@@ -607,7 +607,7 @@ function SimulationsManager() {
                       />
                     ) : (
                       selectedSimulation.category && (
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full border border-blue-200">
+                        <span className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
                           📂 {selectedSimulation.category}
                         </span>
                       )
@@ -852,7 +852,7 @@ function SimulationsManager() {
                   {isEditing && (
                     <button
                       onClick={handleAddTask}
-                      className="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+                      className="bg-emerald-600 text-white text-sm px-4 py-2 rounded hover:bg-emerald-700"
                     >
                       Add Task
                     </button>
