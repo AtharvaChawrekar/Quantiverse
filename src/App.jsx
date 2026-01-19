@@ -56,6 +56,7 @@ import ScanResults from "./components/ScanResults";
 import AddInternship from "./components/admin/AddInternship";
 import SimulationsManager from "./components/admin/SimulationsManager";
 import Confirmation from "./components/admin/Confirmation";
+import AdminTaskManager from "./components/admin/AdminTaskManager";
 import InternshipCandidates from "./components/internship/InternshipCandidates";
 import InternshipSubmissions from "./components/internship/InternshipSubmissions";
 import LandingPage from "./components/resume_builder/LandingPage";
@@ -64,6 +65,7 @@ import DocumentCenter from "./components/document_center/DocumentCenter";
 import UserProfile from "./components/profile/UserProfile";
 import ActivityTracker from "./components/utils/ActivityTracker";
 import Homepage from "./components/Homepage";
+import TaskSubmission from "./components/tasks/TaskSubmission";
 
 function App() {
   const { session } = UserAuth();
@@ -138,6 +140,22 @@ function App() {
         element={
           <ProtectedRoute>
             <UserProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/tasks"
+        element={
+          <ProtectedRoute>
+            <AdminTaskManager />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/submit-task"
+        element={
+          <ProtectedRoute>
+            <TaskSubmission />
           </ProtectedRoute>
         }
       />
