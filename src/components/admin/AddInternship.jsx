@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Editor } from "@tinymce/tinymce-react";
 import CategoryAutocomplete from "../CategoryAutocomplete";
 import QuizBuilder, { createEmptyQuiz } from "./QuizBuilder";
+import ImageUploader from './ImageUploader';
 
 // TinyMCE imports for self-hosted GPL mode
 import "tinymce/tinymce";
@@ -632,6 +633,23 @@ function AddInternship() {
                       <div className="text-sm text-gray-600 mt-1">
                         {value.length} / 500 chars
                       </div>
+                    </div>
+                  );
+                }
+
+                // Use ImageUploader for image field
+                if (key === "image") {
+                  return (
+                    <div key={key} className="md:col-span-2">
+                      <ImageUploader
+                        currentImage={value}
+                        onImageChange={(url) => {
+                          setSimulation((prev) => ({ ...prev, image: url }));
+                        }}
+                        onImageUrlChange={(url) => {
+                          setSimulation((prev) => ({ ...prev, image: url }));
+                        }}
+                      />
                     </div>
                   );
                 }

@@ -6,12 +6,15 @@ import './styles.css';
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import { AuthContextProvider } from "./components/Auth/AuthContext";
+import { NotificationProvider } from "./components/notifications/NotificationContext";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <AuthContextProvider>
-        <App />
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
       </AuthContextProvider>
     </BrowserRouter>
   </StrictMode>

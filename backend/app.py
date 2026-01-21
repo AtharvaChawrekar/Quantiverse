@@ -13,6 +13,8 @@ import secrets
 from flask_cors import CORS
 from supabase import create_client
 from internship_api import internship_bp
+from notification_service import notification_bp
+from file_upload_service import file_upload_bp
 # Lazy import utils only when needed to avoid heavy dependencies on startup
 # from utils import generate_latex, compile_latex_to_pdf
 import io
@@ -123,6 +125,18 @@ app.config['supabase_admin'] = supabase_admin
 
 # Register Blueprints
 app.register_blueprint(internship_bp)
+app.register_blueprint(notification_bp)
+app.register_blueprint(file_upload_bp)
+
+# Serve uploaded files
+@app.route('/uploads/<path:filename>')
+def serve_uploaded_file(filename):
+    """Serve uploaded files (images, etc.)"""
+    try:
+        uploads_dir = os.path.join(os.getcwd(), 'uploads')
+        return send_file(os.path.join(uploads_dir, filename))
+    except Exception as e:
+        return jsonify({'error': 'File not found'}), 404
 
 
 
